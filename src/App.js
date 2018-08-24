@@ -2,6 +2,8 @@ import './css/App.css';
 
 import React, { Component } from 'react';
 import Container from './components/Container';
+import Positioning from './services/Positioning';
+
 
 import mockEntities from './fixtures/EntitiesMock';
 import mockObjectives from './fixtures/ObjectivesMock';
@@ -19,45 +21,42 @@ class App extends Component {
     }
 
     componentWillMount() {
-        this.fetchEntity(this.props.rootId)
-            .then(res => {
-                root = res;
-                return root.children = root.child_entities;
-            })
-            .then(root => {
-                this.setState({ root: this.hydrateObjectives(root) });
-            })
-
+        this.fetchEntity()
+            .then(root => this.hydrateEntities(root))
+            .then(root => this.hydrateObjectives(root))
+            .then(root => Positioning.tree(root));
     }
 
-    async fetchEntity(id) {
-        return await fetch('https://okr.r3connect.me/api/entities/the-iconic').then(res => res.json());
+    fetchEntity() {
+        return fetch('https://okr.r3connect.me/api/entities/the-iconic').then(res => res.json()).then(res => res.data);
     }
 
-    fetchChildren(entityId) {
-        return (
-            mockEntities
-            .filter( entity => entity.parentId === entityId )
-            .map( entity => { 
-                entity.children = this.fetchChildren(entity.id); 
-                return entity;
-            })
-        );
+    fetchEntityObjectives(id) {
+        return fetch("https://okr.r3connect.me/api/entities/the-iconic/objectives").then(res => res.json()).then(res => res.data);
+    }
+
+    hydrateEntities(root) {
+      root.children = root.child_entities || [];
+
+      if (! root.child_entities) return root;
+
+      root.child_entities.forEach(this.hydrateEntities);
+
+      return root;
     }
 
     hydrateObjectives(root) {
-        root.objectives = mockObjectives.filter( objective => objective.entityIds.includes(root.id) );
-
-        root.children = root.children.map( child => {
-            child = this.hydrateObjectives(child);
-            return child;
-        });
-
-        return root;
+        return this.fetchEntityObjectives()
+            .then(objectives => objectives.map(objective => root.objective = objective))
+            .then(objectives => this.setState({ root: root }));
     }
 
     render() {
         const { root } = this.state;
+
+        if (!root) {
+            return <div />
+        }
 
         return (
             <Container 

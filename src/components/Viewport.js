@@ -28,7 +28,6 @@ class Viewport extends Component {
                     left: rowWidth + xDepth * 100
                 };
 
-console.info(node);
                 rowWidth += node.label.length * 6;
 
                 domNodes.push({

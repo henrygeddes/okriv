@@ -51,13 +51,13 @@ class Container extends Component {
     }
 
     hydrateNodes(root, parentId, depth) {
-        const nodeId = `${root.type}__${root.id}`;
+        const nodeId = `${root.name}__${root.id}`;
 
         this.pushNode({
             id:     nodeId,
             parentId: parentId,
             label:  root.name,
-            type:   root.type,
+            type:   root.name,
             depth:  depth,
         });
 
