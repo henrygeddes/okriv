@@ -15,7 +15,7 @@ class Viewport extends Component {
     createNodesForDom() {
         const domNodes = [];
         const { depthMap, edges } = this.props;
-
+console.log(this.props);
         const rows = {};
 
         Object.keys(depthMap).forEach(depth => {

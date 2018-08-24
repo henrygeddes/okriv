@@ -59,9 +59,11 @@ class Container extends Component {
             label:  root.name,
             type:   root.name,
             depth:  depth,
+            position: root.position
         });
 
-        root.children.forEach(child => this.hydrateNodes(child, nodeId, depth + 1));
+        if (! root.child_entities) root.child_entities = [];
+        root.child_entities.forEach(child => this.hydrateNodes(child, nodeId, depth + 1));
     }
 
     getEdges(depthMap = null) {

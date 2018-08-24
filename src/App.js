@@ -22,9 +22,8 @@ class App extends Component {
 
     componentWillMount() {
         this.fetchEntity()
-            .then(root => this.hydrateEntities(root))
-            .then(root => this.hydrateObjectives(root))
-            .then(root => Positioning.tree(root));
+            .then(root => Positioning.tree(root))
+            .then(root => this.hydrateObjectives(root));
     }
 
     fetchEntity() {
@@ -35,27 +34,18 @@ class App extends Component {
         return fetch("https://okr.r3connect.me/api/entities/the-iconic/objectives").then(res => res.json()).then(res => res.data);
     }
 
-    hydrateEntities(root) {
-      root.children = root.child_entities || [];
-
-      if (! root.child_entities) return root;
-
-      root.child_entities.forEach(this.hydrateEntities);
-
-      return root;
-    }
-
     hydrateObjectives(root) {
         return this.fetchEntityObjectives()
             .then(objectives => objectives.map(objective => root.objective = objective))
-            .then(objectives => this.setState({ root: root }));
+            .then(objectives => this.setState({ root: root }))
+            .then(e => root);
     }
 
     render() {
         const { root } = this.state;
 
         if (!root) {
-            return <div />
+            return null;
         }
 
         return (
