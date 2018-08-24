@@ -19,16 +19,19 @@ class App extends Component {
     }
 
     componentWillMount() {
-        const root = this.fetchEntity(this.props.rootId);
+        this.fetchEntity(this.props.rootId)
+            .then(res => {
+                root = res;
+                return root.children = root.child_entities;
+            })
+            .then(root => {
+                this.setState({ root: this.hydrateObjectives(root) });
+            })
 
-        root.children = this.fetchChildren(root.id);
-
-        this.setState({ root: this.hydrateObjectives(root) });
     }
 
-    fetchEntity(id) {
-        id = parseInt(id, 10);
-        return mockEntities.filter(o => o.id === id).pop(); // api.fetch(`/api/entities/${id}`);
+    async fetchEntity(id) {
+        return await fetch('https://okr.r3connect.me/api/entities/the-iconic').then(res => res.json());
     }
 
     fetchChildren(entityId) {
