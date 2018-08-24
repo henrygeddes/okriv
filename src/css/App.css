@@ -1,0 +1,25 @@
+.container {
+    position: absolute;
+}
+
+.node {
+    border-radius: 500px;
+    width: auto;
+    height: auto;
+    max-width: 100px;
+    border: 1px solid #000;
+    position: absolute;
+    text-align: center;
+    padding: 5px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.node.node--company {
+    background-color: #000;
+    color: #fff;
+}
+
+.node.node--department {
+    border-style: dotted;
+}
