@@ -3,13 +3,15 @@
 }
 
 .node {
-    border-radius: 500px;
-    width: auto;
-    height: auto;
-    max-width: 100px;
+    border-radius: 100%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     border: 1px solid #000;
     position: absolute;
-    text-align: center;
     padding: 5px;
     font-family: monospace;
     font-size: 12px;

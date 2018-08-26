@@ -2,7 +2,6 @@ import './css/App.css';
 
 import React, { Component } from 'react';
 import Container from './components/Container';
-import Positioning from './services/Positioning';
 
 
 import mockEntities from './fixtures/EntitiesMock';
@@ -22,7 +21,6 @@ class App extends Component {
 
     componentWillMount() {
         this.fetchEntity()
-            .then(root => Positioning.tree(root))
             .then(root => this.hydrateObjectives(root));
     }
 
