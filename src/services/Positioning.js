@@ -1,47 +1,63 @@
-const DEFAULTS = {
-    canvas: {
-        height: 1000,
-        width: window.innerWidth
-    },
-    nodes: {
-        width: 112,
-        height: 112,
-    }
-}
-
 class Positioning {
 
-    updateTreePosition(root, depthNodesCount = 0, column = 0) {
+    updateTreePosition(root, parent, depthNodesCount = 0, index = 0, depth = 0) {
         root.position = {
-            offsetX: this.getOffsetX(DEFAULTS.canvas.width, DEFAULTS.nodes.width, depthNodesCount, column),
-            offsetY: this.getOffsetY(DEFAULTS.nodes.height, root.depth, depthNodesCount, column)
+            offsetX: (!depth) ? this.canvas.width / 2 : this.getOffsetX(parent, this.canvas.width, depthNodesCount, index),
+            offsetY: (!depth) ? this.canvas.height / 2 : this.getOffsetY(parent, this.canvas.height, depthNodesCount, index),
+            depth: depth
         }
 
         if (! root.child_entities) return root;
 
         depthNodesCount = root.child_entities.length;
-        root.child_entities.map( (child, pos) => this.updateTreePosition(child, depthNodesCount, pos));
+        depth++;
+
+        root.child_entities.map( (child, index) => this.updateTreePosition(child, root, depthNodesCount, index, depth));
 
         return root;
     }
+    
 
-    getOffsetX(canvasWidth, width, depthNodesCount, column) {
-        let nodes_width = width * depthNodesCount;
-        let inBetween = depthNodesCount !== 0 ? Math.floor((canvasWidth - nodes_width) / depthNodesCount) : canvasWidth / 2;
+    getOffsetX(parent, canvasWidth, depthNodesCount, index) {
+        const { startRange, endRange } = this.getRanges(parent, index);
+        let pos = 360 / depthNodesCount * index;
+        let angle = Math.cos(pos / 180 * Math.PI);
 
-        return ((inBetween * (column + 1)) + column * width) - (width / 2)
+        return parent.position.offsetX + ( Math.cos((startRange + index * angle) * (Math.PI / 180)) * this.edgeLength );
+
+        return (angle * this.edgeLength) + parent.position.offsetX;
     }
 
-    getOffsetY(height, depth, depthNodesCount, column) {
-        let middle = (depthNodesCount - 1) / 2;
-        let offsetY = ((height * (depth + 1)) + depth * height / 2);
+    getOffsetY(parent, canvasHeight, depthNodesCount, index) {
+        const { startRange, endRange } = this.getRanges(parent, index);
+        let pos =  360 / depthNodesCount * index;
+        let angle = Math.sin(pos / 180 * Math.PI)
 
-        column = column > middle ? depthNodesCount - 1 - column : column;
+        return parent.position.offsetX + ( Math.sin((startRange + index * angle) * (Math.PI / 180)) * this.edgeLength );
 
-        return offsetY + offsetY * 0.2 * column;
+        return (angle * this.edgeLength) + parent.position.offsetY;
     }
 
-    tree(root) {
+    getRanges(parent, index) {
+        const childLength = parent.child_entities.length;
+        const chunk = 360 / childLength;
+        let range = chunk * 2;
+
+        const t = (index + 1) / childLength;
+        let startRange  = (1 - t) * 360;
+        let endRange    = t * 360;
+
+        if( startRange === endRange )
+            startRange = startRange - range;
+
+        range = Math.abs(endRange - startRange);
+
+        return { startRange, endRange, range };
+    }
+
+    tree(root, canvas) {
+        this.canvas = canvas;
+        this.edgeLength = 300;
         return this.updateTreePosition(root);
     }
 }

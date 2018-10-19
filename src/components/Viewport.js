@@ -14,12 +14,19 @@ class Viewport extends Component {
 
     createNodesForDom(nodes) {
         if (nodes.length == 0) return [];
+        console.log(nodes)
 
         let node = nodes.shift();
+        let colors = [
+            'white',
+            'blue',
+            'red'
+        ]
 
         node.style = {
             top: node.position.offsetY,
-            left: node.position.offsetX
+            left: node.position.offsetX,
+            'background-color': colors[node.position.depth]
         };
 
         return [node, ...this.createNodesForDom(nodes), ...this.createNodesForDom(node.children)];
@@ -27,16 +34,17 @@ class Viewport extends Component {
 
     render() {
         const { domNodes } = this.state;
+        const viewportStyle = this.props.style;
 
         return (
-            <div className="viewport">
+            <div className="viewport" style={viewportStyle}>
                 { domNodes.map( (o,i) => 
                     <div 
                         className={`node node--${o.type}`}
                         style={o.style}
                         key={o.id}
                     >
-                        { o.name }
+                        { o.name || o.title }
                     </div>
                 ) }
             </div>

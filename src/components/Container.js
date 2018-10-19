@@ -7,13 +7,21 @@ class Container extends Component {
         super(props);
 
         this.state = {
+            style:  {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            viewportStyle: {
+                width: window.innerHeight - 400,
+                height: window.innerHeight - 400                
+            },
             nodes:   []
         };
     }
 
     componentWillMount() {
         let nodes = this.hydrateNodes(this.props.root, null);
-        nodes = [Positioning.tree(nodes)];
+        nodes = [Positioning.tree(nodes, this.state.viewportStyle)];
         this.setState({ nodes });
     }
 
@@ -27,10 +35,12 @@ class Container extends Component {
     }
 
     render() {
+
         return (
-            <div className="container">
+            <div className="container" style={this.state.style}>
                 <Viewport
                     nodes={this.state.nodes}
+                    style={this.state.viewportStyle}
                 />
             </div>
         );
