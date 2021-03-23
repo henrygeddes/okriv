@@ -6,62 +6,45 @@ class Viewport extends Component {
 
         this.state = { domNodes: [] };
     }
-
-    componentDidUpdate(prevProps) {
-        if( ! prevProps.edges.length )
-            this.createNodesForDom();
-    }
-
-    createNodesForDom() {
-        const domNodes = [];
-        const { depthMap, edges } = this.props;
-console.log(this.props);
-        const rows = {};
-
-        Object.keys(depthMap).forEach(depth => {
-            let rowWidth = 0;
-            let rowHeight = 0;
-
-            depthMap[depth].forEach((node, xDepth) => {
-                const style = {
-                    top: depth * 100,
-                    left: rowWidth + xDepth * 100
-                };
-
-                rowWidth += node.label.length * 6;
-
-                domNodes.push({
-                    style: style,
-                    node: node,
-                    width: node.label.length * 6
-                });
-            });
-
-            rows[depth] = {
-                width: rowWidth,
-                nodeCount: depthMap[depth].length
-            };
-        });
-
-        domNodes[0].style.left = (rows[1].nodeCount * 100 + rows[1].width) / 2 - domNodes[0].width;
-
-
+    
+    componentWillMount(prevProps) {
+        const domNodes = this.createNodesForDom(this.props.nodes);
         this.setState({ domNodes });
     }
 
+    createNodesForDom(nodes) {
+        if (nodes.length == 0) return [];
+        console.log(nodes)
+
+        let node = nodes.shift();
+        let colors = [
+            'white',
+            'blue',
+            'red'
+        ]
+
+        node.style = {
+            top: node.position.offsetY,
+            left: node.position.offsetX,
+            'background-color': colors[node.position.depth]
+        };
+
+        return [node, ...this.createNodesForDom(nodes), ...this.createNodesForDom(node.children)];
+    }
+
     render() {
-        // const nodes = this.createNodesForDom();
         const { domNodes } = this.state;
+        const viewportStyle = this.props.style;
 
         return (
-            <div className="viewport">
-                { domNodes.map( o => 
+            <div className="viewport" style={viewportStyle}>
+                { domNodes.map( (o,i) => 
                     <div 
-                        className={`node node--${o.node.type}`}
+                        className={`node node--${o.type}`}
                         style={o.style}
-                        key={o.node.id}
+                        key={o.id}
                     >
-                        { o.node.label }
+                        { o.name || o.title }
                     </div>
                 ) }
             </div>
